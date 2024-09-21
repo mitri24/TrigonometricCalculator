@@ -1,0 +1,248 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+public class GUI extends JFrame implements ActionListener {
+    // Deklaration der Instanzvariablen
+    private JTextField operandxField;
+    private JTextField operandyField;
+    private JTextField resultField;
+    private JButton plus;
+    private JButton minus;
+    private JButton mal;
+    private JButton durch;
+    private JButton sin;
+    private JButton cos;
+    private JButton hochzahlen;
+    private JButton log;
+    private JButton clear;
+
+    private JCheckBox deg;
+    private JCheckBox rad;
+    private JCheckBox hellesDisplay;
+
+
+    public GUI() {
+        // Hauptpanel erstellen
+        JPanel mainPanel = new JPanel();
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        mainPanel.setLayout(new BorderLayout());
+
+        // Panel für die Textfelder
+        JPanel textFieldPanel = new JPanel();
+        textFieldPanel.setLayout(new GridLayout(3, 1, 5, 5));
+
+        operandxField = new JTextField(10);
+        //operandxField.setBackground(Color.BLACK); // Hintergrundfarbe auf Schwarz setzen
+        //operandxField.setForeground(Color.YELLOW); // Schriftfarbe auf Weiß setzen
+        operandyField = new JTextField(10);
+        //operandyField.setBackground(Color.BLACK); // Hintergrundfarbe auf Schwarz setzen
+       // operandyField.setForeground(Color.YELLOW); // Schriftfarbe auf Weiß setzen
+        resultField = new JTextField(10);
+        resultField.setEditable(false); // Ergebnisfeld soll nicht editierbar sein
+       // resultField.setBackground(Color.BLACK); // Hintergrundfarbe auf Schwarz setzen
+        //resultField.setForeground(Color.YELLOW); // Schriftfarbe auf Weiß setzen
+        // Erstellen der Labels
+        JLabel operandxLabel = new JLabel("Operand X:");
+        JLabel operandyLabel = new JLabel("Operand Y:");
+        JLabel resultLabel = new JLabel("Resultat:");
+
+        // Panel für Operand X
+        JPanel operandxPanel = new JPanel(new BorderLayout(5, 5));
+        operandxPanel.add(operandxLabel, BorderLayout.WEST);
+        operandxPanel.add(operandxField, BorderLayout.CENTER);
+
+        // Panel für Operand Y
+        JPanel operandyPanel = new JPanel(new BorderLayout(5, 5));
+        operandyPanel.add(operandyLabel, BorderLayout.WEST);
+        operandyPanel.add(operandyField, BorderLayout.CENTER);
+
+        // Panel für Resultat
+        JPanel resultPanel = new JPanel(new BorderLayout(5, 5));
+        resultPanel.add(resultLabel, BorderLayout.WEST);
+        resultPanel.add(resultField, BorderLayout.CENTER);
+
+        // Hinzufügen der Panels zum Hauptpanel
+        textFieldPanel.add(operandxPanel);
+        textFieldPanel.add(operandyPanel);
+        textFieldPanel.add(resultPanel);
+
+        // Panel für die Checkboxen
+        JPanel checkBoxPanel = new JPanel();
+        checkBoxPanel.setLayout(new GridLayout(3, 1, 5, 5));
+
+        deg = new JCheckBox("Deg");
+        rad = new JCheckBox("Rad");
+        hellesDisplay = new JCheckBox("Helles Display");
+
+        JCheckBox[] checkBox1 = {deg, rad, hellesDisplay};
+
+
+
+        for (JCheckBox checkBox : checkBox1) {
+            checkBoxPanel.add(checkBox);
+            checkBox.addActionListener(this);
+        }
+        checkBoxPanel.setLayout(new BoxLayout(checkBoxPanel, BoxLayout.X_AXIS));
+
+        // Panel für die Buttons
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridLayout(2, 4, 5, 5));
+
+        plus = new JButton("+");
+        minus = new JButton("-");
+        mal = new JButton("*");
+        durch = new JButton("/");
+        sin = new JButton("sin");
+        cos = new JButton("cos");
+        hochzahlen = new JButton("x^y");
+        log = new JButton("log 2");
+
+        JButton[] buttons = {plus, minus, mal, durch, sin, cos, hochzahlen, log};
+
+        for (JButton button : buttons) {
+            button.addActionListener(this); // ActionListener hinzufügen
+            buttonPanel.add(button);
+        }
+
+        clear = new JButton("clear");
+        clear.addActionListener(this); // ActionListener hinzufügen
+        JPanel clearButtonPanel = new JPanel();
+        clearButtonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        clearButtonPanel.add(clear);
+
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS)); // BoxLayout für vertikale Anordnung
+        centerPanel.add(checkBoxPanel);
+        centerPanel.add(Box.createVerticalStrut(20)); // Abstandhalter
+        centerPanel.add(buttonPanel);
+
+        // Panels zum Hauptpanel hinzufügen
+        mainPanel.add(textFieldPanel, BorderLayout.NORTH);
+        mainPanel.add(centerPanel, BorderLayout.CENTER);
+        mainPanel.add(clearButtonPanel, BorderLayout.SOUTH);
+
+        // Hauptpanel zum Frame hinzufügen
+        add(mainPanel);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setTitle("Taschenrechner");
+        pack();
+        setVisible(true);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(GUI::new);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Object source = e.getSource();
+
+
+        // Handling the checkboxes
+        if (source == deg) {
+            if (deg.isSelected()) {
+                rad.setSelected(false); // Ensure only one of "Deg" or "Rad" is selected
+            } else {
+                rad.setSelected(true); // If "Deg" is unchecked, check "Rad"
+            }
+            return;
+        } else if (source == rad) {
+            if (rad.isSelected()) {
+                deg.setSelected(false); // Ensure only one of "Deg" or "Rad" is selected
+            } else {
+                deg.setSelected(true); // If "Rad" is unchecked, check "Deg"
+            }
+            return;
+        } else if (source.equals(hellesDisplay)) {
+            // Entferne die alten Textfelder
+            if (hellesDisplay.isSelected()) {
+                setLightDisplay(); // Setze helle Anzeige
+            } else {
+                setDarkDisplay(); // Setze dunkle Anzeige
+            }
+        }
+
+
+        try {
+            double operandX = Double.parseDouble(operandxField.getText());
+            double operandY = Double.parseDouble(operandyField.getText());
+            double result = 0;
+
+            if (source == plus) {
+                result = operandX + operandY;
+            } else if (source == minus) {
+                result = operandX - operandY;
+            } else if (source == mal) {
+                result = operandX * operandY;
+            } else if (source == durch) {
+                if (operandY != 0) {
+                    result = operandX / operandY;
+                } else {
+                    JOptionPane.showMessageDialog(this, "Division durch Null nicht erlaubt", "Fehler", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            } else if (source == sin) {
+                if (deg.isSelected()) {
+                    result = Math.sin(Math.toRadians(operandX));
+                } else {
+                    result = Math.sin(operandX);
+                }
+            } else if (source == cos) {
+                if (deg.isSelected()) {
+                    result = Math.cos(Math.toRadians(operandX));
+                } else {
+                    result = Math.cos(operandX);
+                }
+            } else if (source == hochzahlen) {
+                result = Math.pow(operandX, operandY);
+            } else if (source == log) {
+                if (operandX > 0) {
+                    result = Math.log(operandX) / Math.log(2); // Logarithmus zur Basis 2
+                } else {
+                    JOptionPane.showMessageDialog(this, "Logarithmus von nicht-positiven Zahlen ist nicht definiert", "Fehler", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            } else if (source == clear) {
+                operandxField.setText("");
+                operandyField.setText("");
+                resultField.setText("");
+                return;
+
+            }
+            resultField.setText(String.valueOf(result));
+        } catch (
+                NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Bitte geben Sie gültige Zahlen ein", "Fehler", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    // Methode zum Setzen des hellen Displays
+    private void setLightDisplay() {
+        operandxField.setBackground(Color.WHITE);
+        operandxField.setForeground(Color.BLACK);
+
+        operandyField.setBackground(Color.WHITE);
+        operandyField.setForeground(Color.BLACK);
+
+        resultField.setEditable(false);
+        resultField.setBackground(Color.WHITE);
+        resultField.setForeground(Color.BLACK);
+    }
+
+    // Methode zum Setzen des dunklen Displays
+    private void setDarkDisplay() {
+        operandxField.setBackground(Color.BLACK);
+        operandxField.setForeground(Color.YELLOW);
+
+        operandyField.setBackground(Color.BLACK);
+        operandyField.setForeground(Color.YELLOW);
+
+        resultField.setEditable(false);
+        resultField.setBackground(Color.BLACK);
+        resultField.setForeground(Color.YELLOW);
+    }
+
+}
+
